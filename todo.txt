@@ -1,0 +1,11 @@
+FFMPEG Settings/Transition/Duration Settings - https://github.com/Assassin-1234/discord-wrapped
+https://github.com/leachiM2k/face-movie - Detect and align faces
+
+
+Workflow:
+1. Import images (Window 1)
+2. Output settings - duration/transition speed/etc (Window 1)
+3. Process photos into timeline (Window 2)
+4. Ability to rearange photos in timeline and individual transition nd duration settings here too (Window 2)
+5. Export timeline (Window 2)
+6. Show conformation popup and button t open media play to play file
