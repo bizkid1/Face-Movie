@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.6.33712.159
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Face Movie", "Face Movie\Face Movie.csproj", "{F28FA587-CE5A-46BA-A2A4-8B23BD8770E4}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{F28FA587-CE5A-46BA-A2A4-8B23BD8770E4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F28FA587-CE5A-46BA-A2A4-8B23BD8770E4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F28FA587-CE5A-46BA-A2A4-8B23BD8770E4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F28FA587-CE5A-46BA-A2A4-8B23BD8770E4}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {EF034BE7-672E-49F5-8312-FDA7790C7139}
+	EndGlobalSection
+EndGlobal
