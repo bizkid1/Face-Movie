@@ -1,26 +1,21 @@
-namespace Namespace {
-    
-    using MTCNN = mtcnn.mtcnn.MTCNN;
-    
-    using face_recognition;
-    
-    using cv2;
-    
-    using np = numpy;
-    
-    using Path = pathlib.Path;
-    
-    using System;
-    
-    using System.Collections.Generic;
-    
+
+using MTCNN = mtcnn.mtcnn.MTCNN;
+
+using np = Numpy;
+
+using System;
+using FaceRecognitionDotNet;
+using OpenCvSharp;
+
+namespace Namespace
+{
     public static class Module {
         
         public static object detector = MTCNN();
         
-        public static object detectFace(object file) {
+        public static object DetectFace(object file) {
             // load image and find face locations.
-            var image = face_recognition.load_image_file(file);
+            var image = FaceRecognition.LoadImageFile(file);
             var face_locations2 = detector.detect_faces(image);
             // [
             //   {
@@ -33,23 +28,29 @@ namespace Namespace {
             if (face_locations2.Count == 0) {
                 return;
             }
-            @"
-    Let's find and angle of the face. First calculate 
-    the center of left and right eye by using eye landmarks.
-    ";
+
+            //Let's find and angle of the face. First calculate 
+            //the center of left and right eye by using eye landmarks.
+
             var leftEyeCenter = face_locations2[0]["keypoints"]["left_eye"];
             var rightEyeCenter = face_locations2[0]["keypoints"]["right_eye"];
             // draw the circle at centers and line connecting to them
+            var x = 0; 
+            var y = 0;
+            var w = 0;
+            var h = 0;
             (x, y, w, h) = face_locations2[0]["box"];
+            var x2 = 0;
+            var y2 = 0;
             (x2, y2) = (x + w, y + h);
-            // cv2.rectangle(image, (x, y), (x + w, y + h), (255, 0, 0), 2)
-            // cv2.circle(image, leftEyeCenter, 2, (255, 0, 0), 10)
-            // cv2.circle(image, rightEyeCenter, 2, (255, 0, 0), 10)
-            // cv2.line(image, leftEyeCenter, rightEyeCenter, (255, 0, 0), 10)
+            // Cv2.rectangle(image, (x, y), (x + w, y + h), (255, 0, 0), 2)
+            // Cv2.circle(image, leftEyeCenter, 2, (255, 0, 0), 10)
+            // Cv2.circle(image, rightEyeCenter, 2, (255, 0, 0), 10)
+            // Cv2.line(image, leftEyeCenter, rightEyeCenter, (255, 0, 0), 10)
             // find and angle of line by using slop of the line.
             var dY = rightEyeCenter[1] - leftEyeCenter[1];
             var dX = rightEyeCenter[0] - leftEyeCenter[0];
-            var angle = np.degrees(np.arctan2(dY, dX));
+            var angle = ConvertRadiansToDegrees(Math.Atan2(dY, dX));
             // to get the face at the center of the image,
             // set desired left eye location. Right eye location
             // will be found out by using left eye location.
@@ -58,14 +59,14 @@ namespace Namespace {
             // Set the croped image(face) size after rotaion.
             var desiredFaceWidth = 128;
             var desiredFaceHeight = 128;
-            (desiredFaceWidth, desiredFaceHeight) = (image.shape[1], image.shape[0]);
+            (desiredFaceWidth, desiredFaceHeight) = (image.Width, image.Height);
             var desiredRightEyeX = 1.0 - desiredLeftEye[0];
             // determine the scale of the new resulting image by taking
             // the ratio of the distance between eyes in the *current*
             // image to the ratio of distance between eyes in the
             // *desired* image
-            var dist = np.sqrt(Math.Pow(dX, 2) + Math.Pow(dY, 2));
-            var desiredDist = desiredRightEyeX - desiredLeftEye[0];
+            var dist = Math.Sqrt(Math.Pow(dX, 2) + Math.Pow(dY, 2));
+            var desiredDist = desiredRightEyeX - desiredLeftEye;
             // desiredDist *= desiredFaceWidth
             desiredDist *= 300;
             var scale = desiredDist / dist;
@@ -74,7 +75,7 @@ namespace Namespace {
             // between the two eyes in the input image
             var eyesCenter = ((leftEyeCenter[0] + rightEyeCenter[0]) / 2, (leftEyeCenter[1] + rightEyeCenter[1]) / 2);
             // grab the rotation matrix for rotating and scaling the face
-            var M = cv2.getRotationMatrix2D(eyesCenter, angle, scale);
+            var M = Cv2.GetRotationMatrix2D(eyesCenter, angle, scale);
             // update the translation component of the matrix
             var tX = desiredFaceWidth * 0.5;
             var tY = desiredFaceHeight * desiredLeftEye[1];
@@ -82,15 +83,20 @@ namespace Namespace {
             M[1,2] += tY - eyesCenter[1];
             // apply the affine transformation
             (w, h) = (desiredFaceWidth, desiredFaceHeight);
-            var output = cv2.warpAffine(image, M, (w, h), borderMode: cv2.BORDER_CONSTANT, flags: cv2.INTER_CUBIC);
+            var output = Cv2.WarpAffine(image, M, (w, h), borderMode: Cv2.BORDER_CONSTANT, flags: Cv2.INTER_CUBIC);
             Console.WriteLine("Writing cropped image: c_" + file.name);
-            var font = cv2.FONT_HERSHEY_SIMPLEX;
-            cv2.putText(output, file.name, (10, image.shape[0] - 10), font, 1, (255, 255, 255), 2, cv2.LINE_AA);
-            cv2.imwrite("payload/output/c_" + file.name, cv2.cvtColor(output, cv2.COLOR_RGB2BGR));
+            var font = Cv2.FONT_HERSHEY_SIMPLEX;
+            Cv2.PutText(output, file.name, (10, image.shape[0] - 10), font, 1, (255, 255, 255), 2, Cv2.LINE_AA);
+            Cv2.ImWrite("payload/output/c_" + file.name, Cv2.CvtColor(output, Cv2.COLOR_RGB2BGR));
         }
         
         static Module() {
-            detectFace(file);
+            DetectFace(file);
+        }
+        public static double ConvertRadiansToDegrees(double radians)
+        {
+            double degrees = (180 / Math.PI) * radians;
+            return (degrees);
         }
     }
 }

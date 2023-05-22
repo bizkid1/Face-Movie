@@ -1,5 +1,5 @@
 FFMPEG Settings/Transition/Duration Settings - https://github.com/Assassin-1234/discord-wrapped
-https://github.com/leachiM2k/face-movie - Detect and align faces
+https://github.com/leachiM2k/face-movie - Detect and align faces (Broken down below to utilize C# instead of Python)
 	- https://github.com/shimat/opencvsharp
 	- https://github.com/takuya-takeuchi/FaceRecognitionDotNet
 	- https://github.com/takuya-takeuchi/DlibDotNet
