@@ -1,18 +1,20 @@
 using System;
 using FaceRecognitionDotNet;
-using FaceRecognitionDotNet.Extensions;
 using OpenCvSharp;
 using System.Linq;
 using System.Drawing;
+using System.IO;
 
 namespace Namespace
 {
     public class Module
     {
         private static FaceRecognition _FaceRecognition;
-        public object DetectFace(string file) {
+        public static FileInfo File { get; private set; }
+
+        public object DetectFace(FileInfo file) {
             // load image and find face locations.
-            var image = FaceRecognition.LoadImageFile(file);
+            var image = FaceRecognition.LoadImageFile(file.FullName);
             var face_locations2 = _FaceRecognition.FaceLocations(image, 0, Model.Cnn).ToArray();
             var face_features = _FaceRecognition.FaceLandmark(image, face_locations2);
             // [
@@ -26,7 +28,6 @@ namespace Namespace
             if (face_locations2.Count() == 0) {
                 return null;
             }
-
             //Let's find and angle of the face. First calculate 
             //the center of left and right eye by using eye landmarks.
 
@@ -77,18 +78,26 @@ namespace Namespace
             // update the translation component of the matrix
             var tX = desiredFaceWidth * 0.5;
             var tY = desiredFaceHeight * desiredLeftEye.Item1;
-            M(0,2) += tX - eyesCenter.X;
-            M(1,2) += tY - eyesCenter.Y;
+
+            var XShift = (float)tX - eyesCenter.X;
+            var YShift = (float)tY - eyesCenter.Y;
+            var newEyesCenter = new Point2f(XShift, YShift);
+
+            var newM = Cv2.GetRotationMatrix2D(newEyesCenter, angle, scale);
+
             // apply the affine transformation
             (w, h) = (desiredFaceWidth, desiredFaceHeight);
-            var output = Cv2.WarpAffine(image, M, (w, h), borderMode: Cv2.BORDER_CONSTANT, flags: Cv2.INTER_CUBIC);
-            Console.WriteLine("Writing cropped image: c_" + file.name);
-            var font = Cv2.FONT_HERSHEY_SIMPLEX;
-            Cv2.PutText(output, file.name, (10, image.shape[0] - 10), font, 1, (255, 255, 255), 2, Cv2.LINE_AA);
-            Cv2.ImWrite("payload/output/c_" + file.name, Cv2.CvtColor(output, Cv2.COLOR_RGB2BGR));
+            var CVSize = new OpenCvSharp.Size(w, h);
+            var outputImage = new Mat();
+            var output = Cv2.WarpAffine(image, outputImage, newM, CVSize, InterpolationFlags.Cubic, BorderTypes.Constant);
+
+            Console.WriteLine("Writing cropped image: c_" + file.Name);
+            var font = HersheyFonts.HersheySimplex;
+            Cv2.PutText(output, file.Name, (10, image.shape[0] - 10), font, 1, (255, 255, 255), 2, LineTypes.AntiAlias);
+            Cv2.ImWrite("payload/output/c_" + file.Name, Cv2.CvtColor(output, ColorConversionCodes.RGB2BGR));
         }
         static Module() {
-            DetectFace(file);
+            DetectFace(File);
         }
         public static double ConvertRadiansToDegrees(double radians)
         {

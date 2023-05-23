@@ -4,6 +4,7 @@ https://github.com/leachiM2k/face-movie - Detect and align faces (Broken down be
 	- https://github.com/takuya-takeuchi/FaceRecognitionDotNet
 	- https://github.com/takuya-takeuchi/DlibDotNet
 	- https://github.com/SciSharp/Numpy.NET
+	- https://github.com/rosenbjerg/FFMpegCore
 
 
 Workflow:
